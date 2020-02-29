@@ -19,22 +19,10 @@ require 'vendor/autoload.php';
 $aura = new Aura\Router\RouterContainer();
 $routes = $aura->getMap();
 
-$routes->get('home', '/', static function (RequestInterface $request) {
-    $name = $request->getQueryParams()['name'] ?: 'Guest';
-    return new HtmlResponse('Hello, ' . $name);
-});
-
-$routes->get('about', '/about', static function () {
-    return new HtmlResponse('This is about page.');
-});
-
-$routes->get('blog_show', '/blog/{id}', static function (RequestInterface $request) {
-    $id = $request->getAttribute('id');
-    if ($id > 2) {
-        return new HtmlResponse('Undefined page', 404);
-    }
-    return new JsonResponse(['id' => $id, 'title' => 'Post #' . $id]);
-})->tokens(['id' => '\d+']);
+$routes->get('home', '/', \App\Http\Action\HelloAction::class);
+$routes->get('about', '/about', \App\Http\Action\AboutAction::class);
+$routes->get('blog', '/blog', \App\Http\Action\Blog\IndexAction::class);
+$routes->get('blog_show', '/blog/{id}', \App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
 
 $router = new AuraRouterAdapter($aura);
 

@@ -1,39 +1,32 @@
 <?php
 
+
 namespace Framework\Http\Router;
+
 
 use Framework\Http\Router\Exception\RequestNotFoundException;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
-class Router
+interface Router
 {
-    private $routes;
+    /**
+     * @param ServerRequestInterface $request
+     * @throws RequestNotMatchedException
+     * @return Result
+     */
+    public function match(ServerRequestInterface $request) : Result;
 
-    public function __construct(RouteCollection $routes)
-    {
-        $this->routes = $routes;
-    }
+    /**
+     * @param string $name
+     * @param array $params
+     * @throws RequestNotFoundException
+     * @return string
+     */
+    public function generate(string $name, array $params = []) : string;
 
-    public function match(RequestInterface $request) : Result
-    {
-        foreach ($this->routes->getRoutes() as $route) {
-            if ($result = $route->match($request)) {
-                return $result;
-            }
-        }
-
-        throw new RequestNotMatchedException($request);
-    }
-
-    public function generate(string $name, array $params = []) : string
-    {
-        foreach ($this->routes->getRoutes() as $route) {
-            if (null !== $url = $route->generate($name, $params)) {
-                return $url;
-            }
-        }
-
-        throw new RequestNotFoundException($name, $params);
-    }
+    /**
+     * @param RouteData $data
+     */
+    public function addRoute(RouteData $data) : void;
 }

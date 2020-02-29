@@ -1,8 +1,10 @@
 <?php
 
+use Framework\Http\ActionResolver;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
-use Framework\Http\Router\RouteCollection;
 use Framework\Http\Router\Router;
+use Framework\Http\Router\SimpleRouter\RouteCollection;
+use Framework\Http\Router\SimpleRouter\SimpleRouter;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\Response\HtmlResponse;
@@ -33,19 +35,20 @@ $routes->get('blog_show', '/blog/{id}', static function (RequestInterface $reque
     return new JsonResponse(['id' => $id, 'title' => 'Post #' . $id]);
 }, ['id' => '\d+']);
 
-$router = new Router($routes);
+$router = new SimpleRouter($routes);
 
 
 ### Running
 $request = ServerRequestFactory::fromGlobals();
 
 try {
+    /* @var $router Router */
     $result = $router->match($request);
     foreach ($result->getAttributes() as $attribute => $value) {
         $request = $request->withAttribute($attribute, $value);
     }
     /* @var callable $action */
-    $action = $result->getHandler();
+    $action = (new ActionResolver())->resolve($result->getHandler());
     $response = $action($request);
 } catch (RequestNotMatchedException $e) {
     $response = new HtmlResponse('Undefined page', 404);

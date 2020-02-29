@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Framework\Http\Router\Route;
+namespace Framework\Http\Router\SimpleRouter\Route;
 
 
 use Framework\Http\Router\Result;

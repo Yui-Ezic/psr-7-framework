@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Framework\Http\Router\Route;
+namespace Framework\Http\Router\SimpleRouter\Route;
 
 
 use Framework\Http\Router\Result;
@@ -12,7 +12,7 @@ use Psr\Http\Message\RequestInterface;
  * Реализация интерфейса Route на основе регулярных выражений
  *
  * Class RegexpRoute
- * @package Framework\Http\Router\Route
+ * @package Framework\Http\SimpleRouter\Route
  */
 class RegexpRoute implements Route
 {

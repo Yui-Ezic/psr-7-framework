@@ -1,22 +1,24 @@
 <?php
 
 
-namespace Framework\Http\Router;
+namespace Framework\Http\Router\SimpleRouter;
 
-use Framework\Http\Router\Route\RegexpRoute;
+
+use Framework\Http\Router\SimpleRouter\Route\RegexpRoute;
+use Framework\Http\Router\SimpleRouter\Route\Route;
 
 /**
  * Class RouteCollection
  *
  * Содержит коллекцию маршрутов для сайта.
  *
- * @package Framework\Http\Router
+ * @package Framework\Http\SimpleRouter
  */
 class RouteCollection
 {
     private $routes = [];
 
-    public function addRoute(RegexpRoute $route): void
+    public function addRoute(Route $route): void
     {
         $this->routes[] = $route;
     }
@@ -42,7 +44,7 @@ class RouteCollection
     }
 
     /**
-     * @return RegexpRoute[]
+     * @return Route[]
      */
     public function getRoutes(): array
     {

@@ -6,7 +6,7 @@ use Framework\Http\Router\Result;
 use Framework\Http\Router\Router;
 use Framework\Http\Router\RouteData;
 use Psr\Http\Message\ServerRequestInterface;
-use Framework\Http\Router\Exception\RequestNotFoundException;
+use Framework\Http\Router\Exception\RouteNotFoundException;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 
 class SimpleRouter implements Router
@@ -46,7 +46,7 @@ class SimpleRouter implements Router
             }
         }
 
-        throw new RequestNotFoundException($name, $params);
+        throw new RouteNotFoundException($name, $params);
     }
 
     /**

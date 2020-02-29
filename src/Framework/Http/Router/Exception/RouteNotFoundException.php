@@ -7,7 +7,7 @@ namespace Framework\Http\Router\Exception;
 use LogicException;
 use Throwable;
 
-class RequestNotFoundException extends LogicException
+class RouteNotFoundException extends LogicException
 {
     private $name;
     private $params;

@@ -2,7 +2,7 @@
 
 namespace Tests\Framework\Http;
 
-use Framework\Http\Router\Exception\RequestNotFoundException;
+use Framework\Http\Router\Exception\RouteNotFoundException;
 use Framework\Http\Router\SimpleRouter\RouteCollection;
 use Framework\Http\Router\SimpleRouter\SimpleRouter;
 use InvalidArgumentException;
@@ -109,7 +109,7 @@ class SimpleRouterTest extends TestCase
         $routes = new RouteCollection();
         $router = new SimpleRouter($routes);
 
-        $this->expectException(RequestNotFoundException::class);
+        $this->expectException(RouteNotFoundException::class);
         $router->generate('post');
     }
 

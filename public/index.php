@@ -1,10 +1,9 @@
 <?php
 
 use Framework\Http\ActionResolver;
+use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Framework\Http\Router\Router;
-use Framework\Http\Router\SimpleRouter\RouteCollection;
-use Framework\Http\Router\SimpleRouter\SimpleRouter;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
 use Laminas\Diactoros\Response\HtmlResponse;
@@ -16,7 +15,9 @@ require 'vendor/autoload.php';
 
 
 ### Initialization
-$routes = new RouteCollection();
+
+$aura = new Aura\Router\RouterContainer();
+$routes = $aura->getMap();
 
 $routes->get('home', '/', static function (RequestInterface $request) {
     $name = $request->getQueryParams()['name'] ?: 'Guest';
@@ -33,10 +34,9 @@ $routes->get('blog_show', '/blog/{id}', static function (RequestInterface $reque
         return new HtmlResponse('Undefined page', 404);
     }
     return new JsonResponse(['id' => $id, 'title' => 'Post #' . $id]);
-}, ['id' => '\d+']);
+})->tokens(['id' => '\d+']);
 
-$router = new SimpleRouter($routes);
-
+$router = new AuraRouterAdapter($aura);
 
 ### Running
 $request = ServerRequestFactory::fromGlobals();

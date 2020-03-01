@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Framework\Http;
+namespace Tests\Framework\Http\Router;
 
 use Framework\Http\Router\Exception\RouteNotFoundException;
 use Framework\Http\Router\SimpleRouter\RouteCollection;

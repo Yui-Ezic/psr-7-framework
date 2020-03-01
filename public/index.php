@@ -1,20 +1,22 @@
 <?php
 
-use Framework\Http\ActionResolver;
+use Framework\Http\Pipeline\MiddlewareResolver;
+use Framework\Http\Pipeline\Pipeline;
 use Framework\Http\Router\AuraRouterAdapter;
 use Framework\Http\Router\Exception\RequestNotMatchedException;
 use Framework\Http\Router\Router;
-use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequestFactory;
-use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
-use Psr\Http\Message\RequestInterface;
 
 chdir(dirname(__DIR__));
 require 'vendor/autoload.php';
 
 
 ### Initialization
+
+$params = [
+    'users' => ['admin' => 'password'],
+];
 
 $aura = new Aura\Router\RouterContainer();
 $routes = $aura->getMap();
@@ -23,8 +25,14 @@ $routes->get('home', '/', \App\Http\Action\HelloAction::class);
 $routes->get('about', '/about', \App\Http\Action\AboutAction::class);
 $routes->get('blog', '/blog', \App\Http\Action\Blog\IndexAction::class);
 $routes->get('blog_show', '/blog/{id}', \App\Http\Action\Blog\ShowAction::class)->tokens(['id' => '\d+']);
+$routes->get('cabinet', '/cabinet', [new App\Http\Middleware\BasicAuthMiddleware($params['users']), \App\Http\Action\CabinetAction::class]);
 
 $router = new AuraRouterAdapter($aura);
+$resolver = new MiddlewareResolver();
+$pipeline = new Pipeline();
+
+$pipeline->pipe($resolver->resolve(\App\Http\Middleware\ProfilerMiddleware::class));
+$pipeline->pipe($resolver->resolve(\App\Http\Middleware\CredentialsMiddleware::class));
 
 ### Running
 $request = ServerRequestFactory::fromGlobals();
@@ -35,16 +43,12 @@ try {
     foreach ($result->getAttributes() as $attribute => $value) {
         $request = $request->withAttribute($attribute, $value);
     }
-    /* @var callable $action */
-    $action = (new ActionResolver())->resolve($result->getHandler());
-    $response = $action($request);
+    $handler = $resolver->resolve($result->getHandler());
+    $pipeline->pipe($handler);
 } catch (RequestNotMatchedException $e) {
-    $response = new HtmlResponse('Undefined page', 404);
 }
 
-
-### Postprocessing
-$response = $response->withHeader('X-Developed', 'Yui-Ezic');
+$response = $pipeline->process($request, new \App\Http\Middleware\NotFoundHandler());
 
 
 ### Sending
